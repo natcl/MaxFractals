@@ -1,0 +1,174 @@
+{
+	"pattrstorage" : 	{
+		"name" : "feed",
+		"slots" : 		{
+			"1" : 			{
+				"id" : 1,
+				"data" : 				{
+					"feedback" : [ 0.793085 ],
+					"theta" : [ 4.476783 ],
+					"zoom_x" : [ 0.315 ],
+					"zoom_y" : [ -1.24 ],
+					"anchor_x" : [ 231 ],
+					"anchor_y" : [ 449 ],
+					"brightness" : [ 1.025 ],
+					"contrast" : [ 1.28 ]
+				}
+
+			}
+,
+			"2" : 			{
+				"id" : 2,
+				"data" : 				{
+					"feedback" : [ 0.752416 ],
+					"theta" : [ 4.46735 ],
+					"zoom_x" : [ 0.509 ],
+					"zoom_y" : [ 1.011 ],
+					"anchor_x" : [ 131 ],
+					"anchor_y" : [ 560 ],
+					"brightness" : [ 1.007 ],
+					"contrast" : [ 1.294 ]
+				}
+
+			}
+,
+			"3" : 			{
+				"id" : 3,
+				"data" : 				{
+					"feedback" : [ 0.826851 ],
+					"theta" : [ 3.783223 ],
+					"zoom_x" : [ 0.683 ],
+					"zoom_y" : [ -0.61 ],
+					"anchor_x" : [ 493 ],
+					"anchor_y" : [ 560 ],
+					"brightness" : [ 1.007 ],
+					"contrast" : [ 1.294 ]
+				}
+
+			}
+,
+			"4" : 			{
+				"id" : 4,
+				"data" : 				{
+					"feedback" : [ 0.880009 ],
+					"theta" : [ 1.979677 ],
+					"zoom_x" : [ 0.683 ],
+					"zoom_y" : [ -0.61 ],
+					"anchor_x" : [ 493 ],
+					"anchor_y" : [ 560 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"5" : 			{
+				"id" : 5,
+				"data" : 				{
+					"feedback" : [ 0.880009 ],
+					"theta" : [ 4.294982 ],
+					"zoom_x" : [ 0.928 ],
+					"zoom_y" : [ -0.61 ],
+					"anchor_x" : [ 812 ],
+					"anchor_y" : [ 405 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"6" : 			{
+				"id" : 6,
+				"data" : 				{
+					"feedback" : [ 0.908134 ],
+					"theta" : [ 5.19104 ],
+					"zoom_x" : [ 1.11 ],
+					"zoom_y" : [ -0.61 ],
+					"anchor_x" : [ 575 ],
+					"anchor_y" : [ 475 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"7" : 			{
+				"id" : 7,
+				"data" : 				{
+					"feedback" : [ 0.908134 ],
+					"theta" : [ 4.12433 ],
+					"zoom_x" : [ 0.906 ],
+					"zoom_y" : [ -0.61 ],
+					"anchor_x" : [ 575 ],
+					"anchor_y" : [ 475 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"8" : 			{
+				"id" : 8,
+				"data" : 				{
+					"feedback" : [ 0.908134 ],
+					"theta" : [ 0.084011 ],
+					"zoom_x" : [ 0.915 ],
+					"zoom_y" : [ 0.86 ],
+					"anchor_x" : [ 529 ],
+					"anchor_y" : [ 531 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"9" : 			{
+				"id" : 9,
+				"data" : 				{
+					"feedback" : [ 0.908134 ],
+					"theta" : [ 4.103007 ],
+					"zoom_x" : [ 0.915 ],
+					"zoom_y" : [ 0.86 ],
+					"anchor_x" : [ 529 ],
+					"anchor_y" : [ 531 ],
+					"brightness" : [ 0.82 ],
+					"contrast" : [ 1.361 ]
+				}
+
+			}
+,
+			"10" : 			{
+				"id" : 10,
+				"data" : 				{
+					"feedback" : [ 0.953192 ],
+					"theta" : [ 1.649045 ],
+					"zoom_x" : [ 0.284 ],
+					"zoom_y" : [ 2.36 ],
+					"anchor_x" : [ 611 ],
+					"anchor_y" : [ 705 ],
+					"brightness" : [ 0.989 ],
+					"contrast" : [ 1.118 ]
+				}
+
+			}
+,
+			"11" : 			{
+				"id" : 11,
+				"data" : 				{
+					"feedback" : [ 0.894149 ],
+					"theta" : [ 1.68565 ],
+					"zoom_x" : [ 0.252 ],
+					"zoom_y" : [ 2.265 ],
+					"anchor_x" : [ 611 ],
+					"anchor_y" : [ 688 ],
+					"brightness" : [ 0.989 ],
+					"contrast" : [ 1.118 ]
+				}
+
+			}
+
+		}
+
+	}
+
+}
