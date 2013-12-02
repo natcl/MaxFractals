@@ -174,7 +174,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 1106.0, 473.0, 218.0, 20.0 ],
-					"restore" : [ 475 ],
+					"restore" : [ 531 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -208,7 +208,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 866.0, 473.0, 218.0, 20.0 ],
-					"restore" : [ 575 ],
+					"restore" : [ 529 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -264,7 +264,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 648.0, 473.0, 203.0, 20.0 ],
-					"restore" : [ -0.61 ],
+					"restore" : [ 0.86 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -298,7 +298,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 437.0, 473.0, 203.0, 20.0 ],
-					"restore" : [ 0.906 ],
+					"restore" : [ 0.915 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -346,7 +346,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 263.0, 473.0, 168.0, 20.0 ],
-					"restore" : [ 5.199217 ],
+					"restore" : [ 4.386556 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -408,7 +408,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 13.0, 473.0, 222.0, 20.0 ],
-					"restore" : [ 0.908134 ],
+					"restore" : [ 0.9375 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -1306,20 +1306,20 @@
  ],
 		"parameters" : 		{
 			"obj-76" : [ "flonum", "flonum", 0 ],
-			"obj-26" : [ "slider", "slider", 0 ],
-			"obj-9" : [ "flonum[3]", "flonum[2]", 0 ],
 			"obj-36" : [ "dial", "dial", 0 ],
-			"obj-29" : [ "zoom_x[1]", "flonum", 0 ],
+			"obj-26" : [ "slider", "slider", 0 ],
 			"obj-69" : [ "zoom_x", "flonum", 0 ],
+			"obj-9" : [ "flonum[3]", "flonum[2]", 0 ],
 			"obj-8" : [ "toggle", "toggle", 0 ],
 			"obj-79" : [ "flonum[1]", "flonum", 0 ],
 			"obj-37" : [ "toggle[1]", "toggle[1]", 0 ],
-			"obj-22" : [ "flonum[2]", "flonum[2]", 0 ]
+			"obj-22" : [ "flonum[2]", "flonum[2]", 0 ],
+			"obj-29" : [ "zoom_x[1]", "flonum", 0 ]
 		}
 ,
 		"dependency_cache" : [ 			{
 				"name" : "feed.json",
-				"bootpath" : "/Users/Nat/Dropbox/Projets/Max/Fractals",
+				"bootpath" : "/Users/Nat/Dropbox/Projets/Max/MaxFractals",
 				"patcherrelativepath" : ".",
 				"type" : "JSON",
 				"implicit" : 1
