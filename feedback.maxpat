@@ -63,7 +63,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 4,
 					"outlettype" : [ "preset", "int", "preset", "int" ],
-					"patching_rect" : [ 13.0, 379.0, 100.0, 40.0 ],
+					"patching_rect" : [ 12.5, 316.0, 161.0, 103.0 ],
 					"pattrstorage" : "feed"
 				}
 
@@ -92,7 +92,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 1581.0, 473.0, 205.0, 20.0 ],
-					"restore" : [ 1.361 ],
+					"restore" : [ 1.389 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -140,7 +140,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 1340.0, 473.0, 230.0, 20.0 ],
-					"restore" : [ 0.82 ],
+					"restore" : [ 0.848 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -264,7 +264,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 648.0, 473.0, 203.0, 20.0 ],
-					"restore" : [ 0.86 ],
+					"restore" : [ 0.816 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -298,7 +298,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 437.0, 473.0, 203.0, 20.0 ],
-					"restore" : [ 0.915 ],
+					"restore" : [ 1.086 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -346,7 +346,7 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "" ],
 					"patching_rect" : [ 263.0, 473.0, 168.0, 20.0 ],
-					"restore" : [ 4.386556 ],
+					"restore" : [ 5.375404 ],
 					"saved_object_attributes" : 					{
 						"parameter_enable" : 0
 					}
@@ -1306,15 +1306,15 @@
  ],
 		"parameters" : 		{
 			"obj-76" : [ "flonum", "flonum", 0 ],
-			"obj-36" : [ "dial", "dial", 0 ],
 			"obj-26" : [ "slider", "slider", 0 ],
-			"obj-69" : [ "zoom_x", "flonum", 0 ],
-			"obj-9" : [ "flonum[3]", "flonum[2]", 0 ],
-			"obj-8" : [ "toggle", "toggle", 0 ],
+			"obj-22" : [ "flonum[2]", "flonum[2]", 0 ],
 			"obj-79" : [ "flonum[1]", "flonum", 0 ],
 			"obj-37" : [ "toggle[1]", "toggle[1]", 0 ],
-			"obj-22" : [ "flonum[2]", "flonum[2]", 0 ],
-			"obj-29" : [ "zoom_x[1]", "flonum", 0 ]
+			"obj-8" : [ "toggle", "toggle", 0 ],
+			"obj-69" : [ "zoom_x", "flonum", 0 ],
+			"obj-29" : [ "zoom_x[1]", "flonum", 0 ],
+			"obj-36" : [ "dial", "dial", 0 ],
+			"obj-9" : [ "flonum[3]", "flonum[2]", 0 ]
 		}
 ,
 		"dependency_cache" : [ 			{
