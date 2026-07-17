@@ -1,0 +1,236 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #111;
+  color: #ccc;
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 12px;
+  overflow: hidden;
+  user-select: none;
+}
+
+#app {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+#viewer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  background: #000;
+}
+
+#canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+#panel {
+  width: 280px;
+  min-width: 280px;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #333;
+  overflow-y: auto;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333;
+}
+
+#header h1 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #eee;
+  letter-spacing: 0.5px;
+}
+
+#toggle-btn {
+  width: 32px;
+  height: 24px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #222;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+#toggle-btn.active {
+  background: #1b5e20;
+  border-color: #2e7d32;
+  color: #81c784;
+}
+
+#toggle-btn:hover { opacity: 0.85; }
+
+#controls {
+  flex: 1;
+  padding: 8px 16px;
+  overflow-y: auto;
+}
+
+.ctrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  position: relative;
+}
+
+.ctrl label {
+  width: 64px;
+  font-size: 11px;
+  color: #999;
+  text-align: right;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ctrl input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #333;
+  outline: none;
+}
+
+.ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #4fc3f7;
+  border: 2px solid #1a1a1a;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.ctrl input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.ctrl input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #4fc3f7;
+  border: 2px solid #1a1a1a;
+  cursor: pointer;
+}
+
+.val {
+  width: 48px;
+  font-size: 11px;
+  color: #4fc3f7;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+.dial {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.dial-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #333;
+  background: transparent;
+  transition: border-color 0.15s;
+}
+
+.dial:hover .dial-ring { border-color: #555; }
+
+.dial-indicator {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4fc3f7;
+  top: 50%;
+  left: 50%;
+  margin: -5px 0 0 -5px;
+  pointer-events: none;
+  transition: background 0.15s;
+  box-shadow: 0 0 6px rgba(79, 195, 247, 0.5);
+}
+
+.ctrl:has(.dial) { gap: 4px; }
+.ctrl:has(.dial) label { align-self: flex-start; margin-top: 20px; }
+
+#footer {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid #333;
+  align-items: center;
+}
+
+#presets {
+  flex: 1;
+  background: #222;
+  color: #ccc;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+}
+
+#presets:focus { border-color: #4fc3f7; }
+
+#fullscreen-btn {
+  width: 32px;
+  height: 26px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #222;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s;
+}
+
+#fullscreen-btn:hover { background: #333; color: #eee; }
+
+video { display: none; }
+
+@media (max-width: 700px) {
+  #app { flex-direction: column; }
+  #panel {
+    width: 100%;
+    min-width: 0;
+    max-height: 45vh;
+    border-left: none;
+    border-top: 1px solid #333;
+  }
+  #viewer { flex: 0 1 auto; height: 55vh; }
+}

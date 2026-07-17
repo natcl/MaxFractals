@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaxFractals</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="viewer">
+    <canvas id="canvas"></canvas>
+  </div>
+  <div id="panel">
+    <div id="header">
+      <h1>MaxFractals</h1>
+      <button id="toggle-btn" class="active">●</button>
+    </div>
+
+    <div id="controls">
+      <div class="ctrl">
+        <label>Feedback</label>
+        <input type="range" id="feedback" min="0" max="1" step="0.001" value="0.9375">
+        <span class="val" id="feedback-val">0.938</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Theta</label>
+        <div id="theta-dial" class="dial">
+          <div class="dial-ring"></div>
+          <div class="dial-indicator"></div>
+        </div>
+        <span class="val" id="theta-val">5.38</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Zoom X</label>
+        <input type="range" id="zoom-x" min="-3" max="3" step="0.001" value="1.086">
+        <span class="val" id="zoom-x-val">1.086</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Zoom Y</label>
+        <input type="range" id="zoom-y" min="-3" max="3" step="0.001" value="0.816">
+        <span class="val" id="zoom-y-val">0.816</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Anchor X</label>
+        <input type="range" id="anchor-x" min="0" max="1280" step="1" value="529">
+        <span class="val" id="anchor-x-val">529</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Anchor Y</label>
+        <input type="range" id="anchor-y" min="0" max="720" step="1" value="531">
+        <span class="val" id="anchor-y-val">531</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Brightness</label>
+        <input type="range" id="brightness" min="-1" max="1" step="0.001" value="0.848">
+        <span class="val" id="brightness-val">0.848</span>
+      </div>
+
+      <div class="ctrl">
+        <label>Contrast</label>
+        <input type="range" id="contrast" min="0" max="3" step="0.001" value="1.389">
+        <span class="val" id="contrast-val">1.389</span>
+      </div>
+    </div>
+
+    <div id="footer">
+      <select id="presets">
+        <option value="">— Presets —</option>
+      </select>
+      <button id="fullscreen-btn">⛶</button>
+    </div>
+  </div>
+</div>
+
+<video id="video" autoplay playsinline muted></video>
+
+<script src="app.js"></script>
+</body>
+</html>
