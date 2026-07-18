@@ -326,23 +326,35 @@ function handleMIDI(e) {
   if (!mc) return;
 
   const prop = mc.prop;
-  if (val === 0 || val === 64) return;
-
   const delta = midiDelta(val);
-  if (delta === 0) return;
+  const cur = prop === 'theta' ? state.theta : state[prop];
+  const absVal = mc.abs(val);
+  const absDiff = Math.abs(absVal - cur);
+
+  // Auto-detect absolute vs relative
+  const useAbs = val === 0 || val === 127 || absDiff < (mc.max - mc.min) * 0.05;
+
+  let newVal;
+  if (useAbs) {
+    newVal = Math.max(mc.min, Math.min(mc.max, absVal));
+  } else if (delta !== 0) {
+    newVal = Math.max(mc.min, Math.min(mc.max, cur + delta * mc.sens));
+  } else {
+    return;
+  }
 
   if (prop === 'theta') {
-    state.theta = Math.max(mc.min, Math.min(mc.max, state.theta + delta * mc.sens));
+    state.theta = newVal;
     updateDial(state.theta);
   } else {
-    state[prop] = Math.max(mc.min, Math.min(mc.max, state[prop] + delta * mc.sens));
+    state[prop] = newVal;
     const el = document.getElementById(ctrlId);
-    if (el) el.value = state[prop];
+    if (el) el.value = newVal;
     const vEl = document.getElementById(ctrlId + '-val');
     if (vEl) vEl.textContent = ctrlId.startsWith('anchor')
-      ? Math.round(state[prop]) : state[prop].toFixed(3);
+      ? Math.round(newVal) : newVal.toFixed(3);
   }
-  sendMidiFeedback(key, state[prop], mc);
+  sendMidiFeedback(key, newVal, mc);
 }
 
 function sendMidiFeedback(key, val, mc) {
