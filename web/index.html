@@ -6,7 +6,7 @@
 <title>MaxFractals</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body oncontextmenu="return false;">
 <div id="app">
   <div id="viewer">
     <canvas id="canvas"></canvas>
@@ -14,7 +14,10 @@
   <div id="panel">
     <div id="header">
       <h1>MaxFractals</h1>
-      <button id="toggle-btn" class="active">●</button>
+      <div id="header-right">
+        <span id="midi-dot" title="MIDI disconnected">○</span>
+        <button id="toggle-btn" class="active">●</button>
+      </div>
     </div>
 
     <div id="controls">
@@ -22,6 +25,7 @@
         <label>Feedback</label>
         <input type="range" id="feedback" min="0" max="1" step="0.001" value="0.9375">
         <span class="val" id="feedback-val">0.938</span>
+        <span class="midi-badge" id="feedback-midi"></span>
       </div>
 
       <div class="ctrl">
@@ -31,42 +35,49 @@
           <div class="dial-indicator"></div>
         </div>
         <span class="val" id="theta-val">5.38</span>
+        <span class="midi-badge" id="theta-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Zoom X</label>
         <input type="range" id="zoom-x" min="-3" max="3" step="0.001" value="1.086">
         <span class="val" id="zoom-x-val">1.086</span>
+        <span class="midi-badge" id="zoom-x-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Zoom Y</label>
         <input type="range" id="zoom-y" min="-3" max="3" step="0.001" value="0.816">
         <span class="val" id="zoom-y-val">0.816</span>
+        <span class="midi-badge" id="zoom-y-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Anchor X</label>
         <input type="range" id="anchor-x" min="0" max="1280" step="1" value="529">
         <span class="val" id="anchor-x-val">529</span>
+        <span class="midi-badge" id="anchor-x-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Anchor Y</label>
         <input type="range" id="anchor-y" min="0" max="720" step="1" value="531">
         <span class="val" id="anchor-y-val">531</span>
+        <span class="midi-badge" id="anchor-y-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Brightness</label>
         <input type="range" id="brightness" min="-1" max="1" step="0.001" value="0.848">
         <span class="val" id="brightness-val">0.848</span>
+        <span class="midi-badge" id="brightness-midi"></span>
       </div>
 
       <div class="ctrl">
         <label>Contrast</label>
         <input type="range" id="contrast" min="0" max="3" step="0.001" value="1.389">
         <span class="val" id="contrast-val">1.389</span>
+        <span class="midi-badge" id="contrast-midi"></span>
       </div>
     </div>
 

@@ -165,6 +165,23 @@ const state = {
   contrast: 1.389,
 };
 
+const midiControls = {
+  'feedback':   { prop: 'feedback',   min: 0, max: 1,     sens: 0.005, abs: v => v / 127 },
+  'theta':      { prop: 'theta',      min: 0, max: 6.283, sens: 0.02,  abs: v => v / 127 * 6.283 },
+  'zoom-x':     { prop: 'zoomX',      min: -3, max: 3,    sens: 0.02,  abs: v => v / 127 * 6 - 3 },
+  'zoom-y':     { prop: 'zoomY',      min: -3, max: 3,    sens: 0.02,  abs: v => v / 127 * 6 - 3 },
+  'anchor-x':   { prop: 'anchorX',    min: 0, max: 1280,  sens: 5,     abs: v => Math.round(v / 127 * 1280) },
+  'anchor-y':   { prop: 'anchorY',    min: 0, max: 720,   sens: 5,     abs: v => Math.round(v / 127 * 720) },
+  'brightness': { prop: 'brightness', min: -1, max: 1,    sens: 0.01,  abs: v => v / 127 * 2 - 1 },
+  'contrast':   { prop: 'contrast',   min: 0, max: 3,     sens: 0.02,  abs: v => v / 127 * 3 },
+};
+
+let midiAccess = null;
+let midiInput = null;
+let midiOutput = null;
+let midiLearning = null;
+let midiBindings = {};
+
 const PRESETS = [
   { id: 1,  feedback: 0.793085,  theta: 4.476783, zoomX: 0.315,  zoomY: -1.24,  anchorX: 231, anchorY: 449, brightness: 1.025, contrast: 1.28   },
   { id: 2,  feedback: 0.752416,  theta: 4.46735,  zoomX: 0.509,  zoomY: 1.011,  anchorX: 131, anchorY: 560, brightness: 1.007, contrast: 1.294  },
@@ -226,6 +243,141 @@ function updateDial(angle) {
   ind.style.left = x + 'px';
   ind.style.top = y + 'px';
   document.getElementById('theta-val').textContent = state.theta.toFixed(3);
+}
+
+function midiDelta(raw) {
+  if (raw >= 1 && raw <= 63) return raw;
+  if (raw >= 65 && raw <= 127) return raw - 128;
+  return 0;
+}
+
+function midiKey(msgType, channel, num) {
+  const t = msgType === 0xB0 ? 'cc' : msgType === 0x90 ? 'note' : '?';
+  return t + '_' + channel + '_' + num;
+}
+
+function loadBindings() {
+  try {
+    const saved = localStorage.getItem('maxfractals-midi');
+    if (saved) midiBindings = JSON.parse(saved);
+  } catch (_) {}
+}
+
+function saveBindings() {
+  try { localStorage.setItem('maxfractals-midi', JSON.stringify(midiBindings)); } catch (_) {}
+}
+
+function updateMidiUI() {
+  const dot = document.getElementById('midi-dot');
+  dot.className = midiLearning ? 'learning'
+    : midiAccess ? 'connected'
+    : '';
+  dot.title = midiLearning ? 'MIDI learn: move a controller'
+    : midiInput ? 'MIDI: ' + midiInput.name
+    : 'Click to connect MIDI';
+
+  for (const id of Object.keys(midiControls)) {
+    const badge = document.getElementById(id + '-midi');
+    const ctrl = badge && badge.closest('.ctrl');
+    const found = Object.entries(midiBindings).find(([k, v]) => v === id);
+    if (badge) {
+      badge.textContent = found ? found[0].replace(/^cc_/, '') : '';
+      badge.classList.toggle('show', !!found);
+    }
+    if (midiLearning === id) {
+      if (ctrl) ctrl.classList.add('learning');
+    } else {
+      if (ctrl) ctrl.classList.remove('learning');
+    }
+  }
+}
+
+function startLearn(id) {
+  if (midiLearning === id) { midiLearning = null; updateMidiUI(); return; }
+  midiLearning = id;
+  updateMidiUI();
+  setTimeout(() => {
+    if (midiLearning === id) { midiLearning = null; updateMidiUI(); }
+  }, 8000);
+}
+
+function handleMIDI(e) {
+  const [status, d1, d2] = e.data;
+  const typ = status & 0xF0;
+  const ch = status & 0x0F;
+  if (typ !== 0xB0 && typ !== 0x90) return;
+
+  const key = midiKey(typ, ch, d1);
+  const val = typ === 0x90 ? (d2 > 0 ? 127 : 0) : d2;
+
+  if (midiLearning) {
+    midiBindings[key] = midiLearning;
+    midiLearning = null;
+    saveBindings();
+    updateMidiUI();
+    return;
+  }
+
+  const ctrlId = midiBindings[key];
+  if (!ctrlId) return;
+  const mc = midiControls[ctrlId];
+  if (!mc) return;
+
+  const prop = mc.prop;
+  if (val === 0 || val === 64) return;
+
+  const delta = midiDelta(val);
+  if (delta === 0) return;
+
+  if (prop === 'theta') {
+    state.theta = Math.max(mc.min, Math.min(mc.max, state.theta + delta * mc.sens));
+    updateDial(state.theta);
+  } else {
+    state[prop] = Math.max(mc.min, Math.min(mc.max, state[prop] + delta * mc.sens));
+    const el = document.getElementById(ctrlId);
+    if (el) el.value = state[prop];
+    const vEl = document.getElementById(ctrlId + '-val');
+    if (vEl) vEl.textContent = ctrlId.startsWith('anchor')
+      ? Math.round(state[prop]) : state[prop].toFixed(3);
+  }
+  sendMidiFeedback(key, state[prop], mc);
+}
+
+function sendMidiFeedback(key, val, mc) {
+  if (!midiOutput) return;
+  const parts = key.split('_');
+  if (parts[0] !== 'cc') return;
+  const ch = parseInt(parts[1]);
+  const num = parseInt(parts[2]);
+  const norm = (val - mc.min) / (mc.max - mc.min);
+  const out = Math.round(Math.max(0, Math.min(127, norm * 127)));
+  try { midiOutput.send([0xB0 | ch, num, out]); } catch (_) {}
+}
+
+async function initMIDI() {
+  if (!navigator.requestMIDIAccess) return;
+  try {
+    midiAccess = await navigator.requestMIDIAccess();
+    for (const inp of midiAccess.inputs.values()) {
+      if (!midiInput) { midiInput = inp; inp.onmidimessage = handleMIDI; }
+    }
+    for (const out of midiAccess.outputs.values()) {
+      if (!midiOutput) midiOutput = out;
+    }
+    midiAccess.onstatechange = () => {
+      for (const inp of midiAccess.inputs.values()) {
+        if (inp.state === 'connected' && !midiInput) {
+          midiInput = inp; inp.onmidimessage = handleMIDI;
+        }
+      }
+      for (const out of midiAccess.outputs.values()) {
+        if (out.state === 'connected' && !midiOutput) midiOutput = out;
+      }
+      updateMidiUI();
+    };
+    loadBindings();
+    updateMidiUI();
+  } catch (_) {}
 }
 
 function render() {
@@ -331,7 +483,15 @@ function setupUI() {
       const vEl = document.getElementById(id + '-val');
       if (vEl) vEl.textContent = id.startsWith('anchor')
         ? Math.round(val) : val.toFixed(3);
+      if (map[id] && midiInput) {
+        const mc = midiControls[id];
+        if (mc) sendMidiFeedback(
+          Object.entries(midiBindings).find(([k, v]) => v === id)?.[0] || '',
+          state[map[id]], mc
+        );
+      }
     });
+    el.addEventListener('contextmenu', e => { e.preventDefault(); startLearn(el.id); });
   });
 
   const dialEl = document.getElementById('theta-dial');
@@ -346,13 +506,15 @@ function setupUI() {
     return Math.atan2(pt.x - cx, cy - pt.y);
   }
 
-  dialEl.addEventListener('mousedown', e => { dragging = true; updateDial(dialAngle(e)); });
+  dialEl.addEventListener('mousedown', e => { if (e.button !== 0) return; dragging = true; updateDial(dialAngle(e)); });
   window.addEventListener('mousemove', e => { if (dragging) updateDial(dialAngle(e)); });
   window.addEventListener('mouseup', () => { dragging = false; });
 
   dialEl.addEventListener('touchstart', e => { dragging = true; updateDial(dialAngle(e)); e.preventDefault(); });
   window.addEventListener('touchmove', e => { if (dragging) { updateDial(dialAngle(e)); e.preventDefault(); } });
   window.addEventListener('touchend', () => { dragging = false; });
+
+  dialEl.addEventListener('contextmenu', e => { e.preventDefault(); startLearn('theta'); });
 
   const sel = document.getElementById('presets');
   PRESETS.forEach(p => {
@@ -372,6 +534,10 @@ function setupUI() {
   document.getElementById('toggle-btn').addEventListener('click', () => {
     running = !running;
     document.getElementById('toggle-btn').classList.toggle('active');
+  });
+
+  document.getElementById('midi-dot').addEventListener('click', () => {
+    if (!midiAccess) initMIDI();
   });
 
   document.getElementById('fullscreen-btn').addEventListener('click', () => {
@@ -401,3 +567,4 @@ function setupUI() {
 initVideo();
 setupUI();
 render();
+initMIDI();
