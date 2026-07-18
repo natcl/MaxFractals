@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIDI Diagnostics — MaxFractals</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #111; color: #ccc;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px; padding: 20px;
+  max-width: 800px; margin: 0 auto;
+}
+h1 { font-size: 18px; color: #eee; margin-bottom: 16px; }
+h2 { font-size: 13px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 8px; }
+button {
+  background: #222; color: #4fc3f7; border: 1px solid #444;
+  padding: 8px 16px; font-size: 13px; border-radius: 4px;
+  cursor: pointer; font-family: inherit;
+}
+button:hover { background: #333; border-color: #4fc3f7; }
+button:disabled { opacity: 0.4; cursor: default; }
+#status { margin: 12px 0; display: flex; align-items: center; gap: 8px; }
+#dot { width: 10px; height: 10px; border-radius: 50%; background: #555; display: inline-block; }
+#dot.ok { background: #66bb6a; box-shadow: 0 0 8px rgba(102,187,106,0.5); }
+#dot.err { background: #e53935; box-shadow: 0 0 8px rgba(229,57,53,0.5); }
+.device-list { margin: 8px 0; }
+.device { padding: 6px 8px; background: #1a1a1a; border-radius: 4px; margin: 4px 0; font-size: 12px; }
+.device .name { color: #eee; }
+.device .meta { color: #777; font-size: 11px; }
+.device .conn { color: #66bb6a; }
+.device .disc { color: #e53935; }
+#msg-log {
+  background: #0a0a0a; border: 1px solid #333; border-radius: 4px;
+  height: 300px; overflow-y: auto; padding: 8px;
+  font-size: 11px; line-height: 1.6;
+}
+#msg-log .entry { padding: 1px 0; border-bottom: 1px solid #1a1a1a; }
+#msg-log .time { color: #555; margin-right: 6px; }
+#msg-log .raw { color: #4fc3f7; margin-right: 8px; }
+#msg-log .parsed { color: #ccc; }
+#msg-log .chan { color: #ce93d8; }
+#msg-log .note { color: #81c784; }
+#msg-log .cc { color: #ffb74d; }
+#toolbar { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+#toolbar label { color: #777; font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.tips { background: #1a1a1a; border-radius: 4px; padding: 12px; font-size: 11px; line-height: 1.8; margin-top: 16px; }
+.tips code { background: #222; padding: 1px 5px; border-radius: 2px; color: #4fc3f7; }
+.tips .ok { color: #66bb6a; }
+.tips .fail { color: #e53935; }
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+  <h1 style="margin-bottom:0">MaxFractals — MIDI Diagnostics</h1>
+  <a href="index.html" style="color:#4fc3f7;font-size:12px;">← Back to app</a>
+</div>
+
+<button id="connect-btn">Connect MIDI</button>
+
+<div id="status">
+  <span id="dot"></span>
+  <span id="status-text">Not connected</span>
+</div>
+
+<h2>Devices</h2>
+<div id="inputs" class="device-list"><em style="color:#555">No inputs</em></div>
+<div id="outputs" class="device-list"><em style="color:#555">No outputs</em></div>
+
+<h2>Message Log</h2>
+<div id="toolbar">
+  <button id="clear-btn">Clear</button>
+  <label><input type="checkbox" id="autoscroll" checked> Auto-scroll</label>
+</div>
+<div id="msg-log"><em style="color:#555">Waiting for MIDI messages...</em></div>
+
+<h2>Troubleshooting Tips</h2>
+<div class="tips">
+  <div class="ok">✔ Twister detected by system: <code>lsusb</code> shows ID 2580:0007</div>
+  <div class="ok">✔ Twister in ALSA: <code>aconnect -i</code> shows <code>client 16: 'Midi Fighter Twister'</code></div>
+  <div class="fail">✗ Browser only sees "Midi Through Port-0" — permissions issue</div>
+  <br>
+  <div><strong>If browser doesn't see the Twister:</strong></div>
+  <div>1. Run <code>groups</code> in terminal — need to see <code>audio</code> in the list</div>
+  <div>2. If missing: <code>sudo usermod -a -G audio $USER</code></div>
+  <div>3. Then <strong>completely restart the browser</strong> (close all windows, reopen)</div>
+  <div>4. If still missing: <code>sudo apt install pipewire-audio</code> or check <code>/etc/group</code></div>
+  <br>
+  <div><strong>Manual checks:</strong></div>
+  <div><code>aconnect -i</code> — list all MIDI input ports</div>
+  <div><code>lsusb</code> — look for "DJ Tech Tools"</div>
+  <div><code>groups</code> — check for <code>audio</code> group</div>
+  <div><code>cat /proc/asound/cards</code> — sound card list</div>
+</div>
+
+<script src="midi-test.js"></script>
+</body>
+</html>
