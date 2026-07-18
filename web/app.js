@@ -181,6 +181,7 @@ let midiInput = null;
 let midiOutput = null;
 let midiLearning = null;
 let midiBindings = {};
+let midiInitStarted = false;
 
 const PRESETS = [
   { id: 1,  feedback: 0.793085,  theta: 4.476783, zoomX: 0.315,  zoomY: -1.24,  anchorX: 231, anchorY: 449, brightness: 1.025, contrast: 1.28   },
@@ -294,6 +295,7 @@ function updateMidiUI() {
 
 function startLearn(id) {
   if (midiLearning === id) { midiLearning = null; updateMidiUI(); return; }
+  if (!midiAccess) { initMIDI(); }
   midiLearning = id;
   updateMidiUI();
   setTimeout(() => {
@@ -355,15 +357,20 @@ function sendMidiFeedback(key, val, mc) {
 }
 
 async function initMIDI() {
-  if (!navigator.requestMIDIAccess) return;
+  if (!navigator.requestMIDIAccess) { console.warn('Web MIDI API not supported'); return; }
+  if (midiInitStarted && midiAccess) return;
+  midiInitStarted = true;
   try {
     midiAccess = await navigator.requestMIDIAccess();
+    console.log('MIDI access granted, devices:', midiAccess.inputs.size, 'inputs,', midiAccess.outputs.size, 'outputs');
     for (const inp of midiAccess.inputs.values()) {
       if (!midiInput) { midiInput = inp; inp.onmidimessage = handleMIDI; }
     }
     for (const out of midiAccess.outputs.values()) {
       if (!midiOutput) midiOutput = out;
     }
+    if (midiInput) console.log('MIDI input connected:', midiInput.name);
+    if (midiOutput) console.log('MIDI output connected:', midiOutput.name);
     midiAccess.onstatechange = () => {
       for (const inp of midiAccess.inputs.values()) {
         if (inp.state === 'connected' && !midiInput) {
@@ -377,7 +384,7 @@ async function initMIDI() {
     };
     loadBindings();
     updateMidiUI();
-  } catch (_) {}
+  } catch (e) { console.warn('MIDI init failed:', e); midiInitStarted = false; }
 }
 
 function render() {
@@ -567,4 +574,3 @@ function setupUI() {
 initVideo();
 setupUI();
 render();
-initMIDI();
