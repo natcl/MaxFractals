@@ -18,19 +18,29 @@ void main() {
 }
 `;
 
-const FRAG = `
+const FRAG_MIX = `
 precision highp float;
 uniform sampler2D u_cam;
 uniform sampler2D u_fb;
-uniform vec2  u_res;
 uniform float u_fbAmt;
+varying vec2 v_uv;
+void main() {
+  vec4 c = texture2D(u_cam, v_uv);
+  vec4 f = texture2D(u_fb, v_uv);
+  gl_FragColor = mix(c, f, u_fbAmt);
+}
+`;
+
+const FRAG_FB = `
+precision highp float;
+uniform sampler2D u_mix;
+uniform vec2  u_res;
 uniform float u_theta;
 uniform vec2  u_zoom;
 uniform vec2  u_anchor;
 uniform float u_bright;
 uniform float u_contrast;
 varying vec2 v_uv;
-
 void main() {
   vec2 uv = v_uv;
   vec2 a = u_anchor / u_res;
@@ -41,10 +51,7 @@ void main() {
   r /= z;
   float ct = cos(-u_theta), st = sin(-u_theta);
   r = vec2(r.x * ct - r.y * st, r.x * st + r.y * ct);
-  vec2 src = r + a;
-  vec4 cam = texture2D(u_cam, src);
-  vec4 fb  = texture2D(u_fb,  src);
-  vec4 m = mix(cam, fb, u_fbAmt);
+  vec4 m = texture2D(u_mix, r + a);
   vec3 c = (m.rgb - 0.5) * u_contrast + 0.5 + u_bright;
   gl_FragColor = vec4(c, 1.0);
 }
@@ -78,16 +85,20 @@ function program(vs, fs) {
   return p;
 }
 
-const progFB = program(VERT, FRAG);
+const progMix = program(VERT, FRAG_MIX);
+const progFB = program(VERT, FRAG_FB);
 const progBlit = program(VERT, FRAG_BLIT);
 
 const u = (p, name) => gl.getUniformLocation(p, name);
 
+const mixUniforms = {
+  cam: u(progMix, 'u_cam'),
+  fb: u(progMix, 'u_fb'),
+  fbAmt: u(progMix, 'u_fbAmt'),
+};
 const fbUniforms = {
-  cam: u(progFB, 'u_cam'),
-  fb: u(progFB, 'u_fb'),
+  mix: u(progFB, 'u_mix'),
   res: u(progFB, 'u_res'),
-  fbAmt: u(progFB, 'u_fbAmt'),
   theta: u(progFB, 'u_theta'),
   zoom: u(progFB, 'u_zoom'),
   anchor: u(progFB, 'u_anchor'),
@@ -96,6 +107,7 @@ const fbUniforms = {
 };
 const blitUniforms = { tex: u(progBlit, 'u_tex') };
 
+const posLocMix = gl.getAttribLocation(progMix, 'a_pos');
 const posLocFB = gl.getAttribLocation(progFB, 'a_pos');
 const posLocBlit = gl.getAttribLocation(progBlit, 'a_pos');
 
@@ -128,13 +140,14 @@ const camTex = (() => {
   return t;
 })();
 
+const mixFbo = makeFBO(W, H);
 const fbos = [makeFBO(W, H), makeFBO(W, H)];
 
-gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[0].fbo);
-gl.clearColor(0,0,0,1);
-gl.clear(gl.COLOR_BUFFER_BIT);
-gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[1].fbo);
-gl.clear(gl.COLOR_BUFFER_BIT);
+[mixFbo, fbos[0], fbos[1]].forEach(f => {
+  gl.bindFramebuffer(gl.FRAMEBUFFER, f.fbo);
+  gl.clearColor(0,0,0,1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+});
 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 let fbIdx = 0;
@@ -224,14 +237,48 @@ function render() {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
   }
 
-  const cur = fbos[fbIdx];
-  const prev = fbos[1 - fbIdx];
+  // Read from previously-written FBO, write to the other (ping-pong)
+  const fbTex = fbos[1 - fbIdx].tex;
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, cur.fbo);
+  // Pass 1: Mix camera + feedback at DIRECT uv → mixFbo
+  gl.bindFramebuffer(gl.FRAMEBUFFER, mixFbo.fbo);
+  gl.viewport(0, 0, W, H);
+  gl.useProgram(progMix);
+
+  gl.uniform1f(mixUniforms.fbAmt, state.feedback);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, camTex);
+  gl.uniform1i(mixUniforms.cam, 0);
+
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, fbTex);
+  gl.uniform1i(mixUniforms.fb, 1);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.enableVertexAttribArray(posLocMix);
+  gl.vertexAttribPointer(posLocMix, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Pass 2: Blit mixFbo to screen (display the raw crossfade only)
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.useProgram(progBlit);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, mixFbo.tex);
+  gl.uniform1i(blitUniforms.tex, 0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.enableVertexAttribArray(posLocBlit);
+  gl.vertexAttribPointer(posLocBlit, 2, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  // Pass 3: Transform mix + brcosa → feedback FBO
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[fbIdx].fbo);
   gl.viewport(0, 0, W, H);
   gl.useProgram(progFB);
 
-  gl.uniform1f(fbUniforms.fbAmt, state.feedback);
   gl.uniform1f(fbUniforms.theta, state.theta);
   gl.uniform2f(fbUniforms.zoom, state.zoomX, state.zoomY);
   gl.uniform2f(fbUniforms.anchor, state.anchorX, state.anchorY);
@@ -240,29 +287,12 @@ function render() {
   gl.uniform2f(fbUniforms.res, W, H);
 
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, camTex);
-  gl.uniform1i(fbUniforms.cam, 0);
-
-  gl.activeTexture(gl.TEXTURE1);
-  gl.bindTexture(gl.TEXTURE_2D, prev.tex);
-  gl.uniform1i(fbUniforms.fb, 1);
+  gl.bindTexture(gl.TEXTURE_2D, mixFbo.tex);
+  gl.uniform1i(fbUniforms.mix, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
   gl.enableVertexAttribArray(posLocFB);
   gl.vertexAttribPointer(posLocFB, 2, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.useProgram(progBlit);
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, cur.tex);
-  gl.uniform1i(blitUniforms.tex, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-  gl.enableVertexAttribArray(posLocBlit);
-  gl.vertexAttribPointer(posLocBlit, 2, gl.FLOAT, false, 0, 0);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
   fbIdx = 1 - fbIdx;
