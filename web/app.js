@@ -364,21 +364,22 @@ async function initMIDI() {
     midiAccess = await navigator.requestMIDIAccess();
     console.log('MIDI access granted, devices:', midiAccess.inputs.size, 'inputs,', midiAccess.outputs.size, 'outputs');
     for (const inp of midiAccess.inputs.values()) {
-      if (!midiInput) { midiInput = inp; inp.onmidimessage = handleMIDI; }
+      inp.onmidimessage = handleMIDI;
+      if (inp.name.toLowerCase().includes('midi fighter')) midiInput = inp;
     }
+    if (!midiInput) midiInput = midiAccess.inputs.values().next().value;
     for (const out of midiAccess.outputs.values()) {
       if (!midiOutput) midiOutput = out;
     }
-    if (midiInput) console.log('MIDI input connected:', midiInput.name);
-    if (midiOutput) console.log('MIDI output connected:', midiOutput.name);
+    if (midiInput) console.log('MIDI input selected:', midiInput.name);
+    if (midiOutput) console.log('MIDI output selected:', midiOutput.name);
     midiAccess.onstatechange = () => {
       for (const inp of midiAccess.inputs.values()) {
-        if (inp.state === 'connected' && !midiInput) {
-          midiInput = inp; inp.onmidimessage = handleMIDI;
-        }
+        inp.onmidimessage = handleMIDI;
+        if (inp.state === 'connected' && inp.name.toLowerCase().includes('midi fighter')) midiInput = inp;
       }
       for (const out of midiAccess.outputs.values()) {
-        if (out.state === 'connected' && !midiOutput) midiOutput = out;
+        if (out.state === 'connected' && (!midiOutput || out.name.toLowerCase().includes('midi fighter'))) midiOutput = out;
       }
       updateMidiUI();
     };
