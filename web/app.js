@@ -342,7 +342,16 @@ function handleMIDI(e) {
   let newVal;
 
   if (midiModes[key] === 'abs') {
-    newVal = Math.max(mc.min, Math.min(mc.max, mc.abs(val)));
+    if (prop === 'theta') {
+      const raw = mc.abs(val);
+      const norm = ((state.theta % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      let diff = raw - norm;
+      if (diff > Math.PI) diff -= 2 * Math.PI;
+      else if (diff < -Math.PI) diff += 2 * Math.PI;
+      newVal = state.theta + diff;
+    } else {
+      newVal = Math.max(mc.min, Math.min(mc.max, mc.abs(val)));
+    }
   } else {
     const delta = midiDelta(val);
     if (delta === 0) return;
