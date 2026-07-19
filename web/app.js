@@ -247,9 +247,10 @@ function updateDial(angle) {
 }
 
 function midiDelta(raw) {
-  if (raw >= 1 && raw <= 63) return raw;
-  if (raw >= 65 && raw <= 127) return raw - 128;
-  return 0;
+  if (raw === 64 || raw === 0) return 0;
+  if (raw >= 61 && raw <= 67) return raw - 64;
+  if (raw <= 60) return raw;
+  return raw - 128;
 }
 
 function midiKey(msgType, channel, num) {
