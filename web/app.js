@@ -181,6 +181,7 @@ let midiInput = null;
 let midiOutput = null;
 let midiLearning = null;
 let midiBindings = {};
+let midiModes = {};
 let midiInitStarted = false;
 
 const PRESETS = [
@@ -314,6 +315,8 @@ function handleMIDI(e) {
   const val = typ === 0x90 ? (d2 > 0 ? 127 : 0) : d2;
 
   if (midiLearning) {
+    const oldKey = Object.entries(midiBindings).find(([k, v]) => v === midiLearning)?.[0];
+    if (oldKey) delete midiModes[oldKey];
     midiBindings[key] = midiLearning;
     midiLearning = null;
     saveBindings();
@@ -326,22 +329,24 @@ function handleMIDI(e) {
   const mc = midiControls[ctrlId];
   if (!mc) return;
 
+  // Detect mode on first message for this binding
+  if (!(key in midiModes)) {
+    if ((val >= 61 && val <= 67) || (val >= 1 && val <= 20) || (val >= 108 && val <= 127))
+      midiModes[key] = 'rel';
+    else
+      midiModes[key] = 'abs';
+  }
+
   const prop = mc.prop;
-  const delta = midiDelta(val);
   const cur = prop === 'theta' ? state.theta : state[prop];
-  const absVal = mc.abs(val);
-  const absDiff = Math.abs(absVal - cur);
-
-  // Auto-detect absolute vs relative
-  const useAbs = val === 0 || val === 127 || absDiff < (mc.max - mc.min) * 0.05;
-
   let newVal;
-  if (useAbs) {
-    newVal = Math.max(mc.min, Math.min(mc.max, absVal));
-  } else if (delta !== 0) {
-    newVal = Math.max(mc.min, Math.min(mc.max, cur + delta * mc.sens));
+
+  if (midiModes[key] === 'abs') {
+    newVal = Math.max(mc.min, Math.min(mc.max, mc.abs(val)));
   } else {
-    return;
+    const delta = midiDelta(val);
+    if (delta === 0) return;
+    newVal = Math.max(mc.min, Math.min(mc.max, cur + delta * mc.sens));
   }
 
   if (prop === 'theta') {
