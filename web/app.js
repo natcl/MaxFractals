@@ -355,7 +355,8 @@ function handleMIDI(e) {
   } else {
     const delta = midiDelta(val);
     if (delta === 0) return;
-    newVal = Math.max(mc.min, Math.min(mc.max, cur + delta * mc.sens));
+    newVal = cur + delta * mc.sens;
+    if (prop !== 'theta') newVal = Math.max(mc.min, Math.min(mc.max, newVal));
   }
 
   if (prop === 'theta') {
